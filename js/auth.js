@@ -22,23 +22,20 @@ if (formLogin) {
             // Créer une session active dans le navigateur
             localStorage.setItem("session_active", JSON.stringify(userTrouve));
             
-            // REDIRECTION VERS LE BON NOM DE FICHIER
+            // REDIRECTION CORRIGÉE : Chemin relatif pour GitHub Pages
             window.location.href = "dashboard.html";
         } else {
             // Afficher le message d'erreur
-            if (erreurConnexion) {
-                erreurConnexion.style.display = "block";
-            } else {
-                alert("Email ou mot de passe incorrect.");
-            }
+            erreurConnexion.style.display = "block";
         }
     });
 }
 
-// Fonction de protection des pages
+// Fonction de protection des pages (À appeler sur les autres écrans)
 function verifierSecuritePage() {
     const session = JSON.parse(localStorage.getItem("session_active"));
     if (!session) {
+        // REDIRECTION CORRIGÉE : Retour relatif à l'écran de login
         window.location.href = "index.html";
     }
     return session;
