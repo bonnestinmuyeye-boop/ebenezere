@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBENEZER - Commandes & Planification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-wrapper" style="display: flex; min-height: 100vh;">
+        <aside class="sidebar" style="width: 260px; background: #0f172a; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="logo" style="font-size: 20px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-print" style="color: #2563eb;"></i>
+                    <span>EBENEZER</span>
+                </div>
+                <nav style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="dashboard.html" class="nav-item" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                    <a href="clients.html" id="menu-clients" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-users"></i> Gestion Clients</a>
+                    <a href="commandes.html" class="nav-item active" style="color: white; text-decoration: none; padding: 12px; border-radius: 8px; background: #1e293b; display: block;"><i class="fa-solid fa-file-invoice"></i> Commandes</a>
+                    <a href="utilisateurs.html" id="menu-users" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-user-gear"></i> Utilisateurs</a>
+                </nav>
+            </div>
+            <div>
+                <button onclick="deconnexion()" style="width: 100%; padding: 8px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                    <i class="fa-solid fa-power-off"></i> Déconnexion
+                </button>
+            </div>
+        </aside>
+
+        <main style="flex: 1; padding: 40px; background: #f8fafc;">
+            <div style="margin-bottom: 30px;">
+                <h1 style="font-size: 28px; color: #0f172a;">Commandes & Planification</h1>
+                <p style="color: #64748b;">Prise de commande et déploiement immédiat sur la chaîne de production</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); height: fit-content;">
+                    <h3 style="margin-bottom: 20px; color: #0f172a;"><i class="fa-solid fa-folder-plus" style="color:#2563eb;"></i> Nouvelle Commande</h3>
+                    <form id="form-commande">
+                        
+                        <div class="form-group">
+                            <label>Sélectionner le Client</label>
+                            <select id="cmd-client-id" required>
+                                <option value="">-- Choisir un client --</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Descriptif du travail (Titre)</label>
+                            <input type="text" id="cmd-titre" placeholder="Ex: Flyers A5 Recto/Verso" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantité (Exemplaires)</label>
+                            <input type="number" id="cmd-quantite" placeholder="Ex: 1000" min="1" required>
+                        </div>
+
+                        <div style="border-top: 1px dashed #cbd5e1; margin: 20px 0; padding-top: 15px;">
+                            <h4 style="font-size: 14px; color:#1e293b; margin-bottom:10px;"><i class="fa-solid fa-calendar-check" style="color:#16a34a;"></i> Affectation & Production</h4>
+                        </div>
+                        <div class="form-group">
+                            <label>Machine assignée</label>
+                            <select id="plan-machine" required>
+                                <option value="Presse Numérique 01">Presse Numérique 01</option>
+                                <option value="Offset KBA Heavy">Offset KBA Heavy</option>
+                                <option value="Traceur Grand Format">Traceur Grand Format</option>
+                                <option value="Massicot & Finition">Massicot & Finition</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Opérateur en charge</label>
+                            <select id="plan-operateur" required>
+                                <option value="">-- Choisir un technicien --</option>
+                                </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Niveau de Priorité</label>
+                            <select id="plan-priorite" required>
+                                <option value="Normale">Normale</option>
+                                <option value="Haute">Haute (Urgent)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date de livraison prévue</label>
+                            <input type="date" id="plan-date" required>
+                        </div>
+
+                        <button type="submit" class="btn-login" style="margin-top: 10px; background:#16a34a;">
+                            <i class="fa-solid fa-truck-ramp-box"></i> Lancer en Production
+                        </button>
+                    </form>
+                </div>
+
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 20px; color: #0f172a;">Registre général des flux de commandes</h3>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 13px;">
+                                <th style="padding: 12px;">COMMANDE & CLIENT</th>
+                                <th style="padding: 12px;">QUANTITÉ</th>
+                                <th style="padding: 12px;">PRODUCTION / AFFECTATION</th>
+                                <th style="padding: 12px; text-align: right;">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-commandes">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/donnees.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Sécurité & Droits d'accès
+        const userInfo = verifierSecuritePage();
+        if (userInfo.role === "Opérateur") {
+            window.location.href = "dashboard.html";
+        }
+        if (userInfo.role === "Planificateur") {
+            document.getElementById("menu-users").style.display = "none";
+        }
+
+        // Initialisation des listes déroulantes (Selects)
+        function preparerFormulaire() {
+            const selectClients = document.getElementById("cmd-client-id");
+            const selectOperateurs = document.getElementById("plan-operateur");
+            
+            // Charger les clients locaux
+            const clients = DB.get("clients");
+            selectClients.innerHTML = '<option value="">-- Choisir un client --</option>';
+            clients.forEach(c => {
+                selectClients.innerHTML += `<option value="${c.id}">${c.nom}</option>`;
+            });
+
+            // Charger uniquement les utilisateurs qui ont le rôle "Opérateur"
+            const utilisateurs = DB.get("users");
+            selectOperateurs.innerHTML = '<option value="">-- Choisir un technicien --</option>';
+            utilisateurs.forEach(u => {
+                if (u.role === "Opérateur") {
+                    selectOperateurs.innerHTML += `<option value="${u.id}">${u.nom}</option>`;
+                }
+            });
+        }
+
+        // Afficher l'historique croisé des commandes
+        function afficherCommandesEtPlanif() {
+            const commandes = DB.get("commandes");
+            const tbody = document.getElementById("table-body-commandes");
+            tbody.innerHTML = "";
+
+            if (commandes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:20px; color:#64748b;">Aucune commande en cours d'exécution.</td></tr>`;
+                return;
+            }
+
+            commandes.forEach(cmd => {
+                const client = DB.trouverParId("clients", cmd.clientId) || { nom: "Client Supprimé" };
+                // Trouver la planification correspondante
+                const planifications = DB.get("planifications");
+                const plan = planifications.find(p => p.commandeId === cmd.id) || { machine: "Non assignée", statut: "Inconnu" };
+                const technicien = DB.trouverParId("users", plan.operateurId) || { nom: "Non assigné" };
+
+                const tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid #f1f5f9";
+                tr.innerHTML = `
+                    <td style="padding: 14px;">
+                        <div style="font-weight: 600; color: #0f172a;">${cmd.titre}</div>
+                        <div style="font-size: 12px; color: #64748b;"><i class="fa-solid fa-building"></i> ${client.nom}</div>
+                    </td>
+                    <td style="padding: 14px; font-weight:600; color:#475569;">${cmd.quantite} ex</td>
+                    <td style="padding: 14px; font-size: 13px; color: #334155;">
+                        <div><i class="fa-solid fa-laptop-code" style="color:#64748b;"></i> ${plan.machine}</div>
+                        <div style="font-size:12px; color:#64748b;"><i class="fa-solid fa-user-gear"></i> Tech : ${technicien.nom}</div>
+                    </td>
+                    <td style="padding: 14px; text-align: right;">
+                        <button onclick="annulerCommande('${cmd.id}')" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:15px;" title="Annuler et Retirer la commande">
+                            <i class="fa-solid fa-rectangle-xmark"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Soumission du Formulaire : Double traitement transactionnel local (Commande + Planification)
+        document.getElementById("form-commande").addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const clientId = document.getElementById("cmd-client-id").value;
+            const titre = document.getElementById("cmd-titre").value.trim();
+            const quantite = parseInt(document.getElementById("cmd-quantite").value);
+            
+            const machine = document.getElementById("plan-machine").value;
+            const operateurId = document.getElementById("plan-operateur").value;
+            const priorite = document.getElementById("plan-priorite").value;
+            const dateLivraison = document.getElementById("plan-date").value;
+
+            const cmdId = "cmd_" + Date.now();
+            const planId = "plan_" + Date.now();
+
+            // 1. Ajouter la commande
+            const nouvelleCommande = { id: cmdId, clientId, titre, quantite, date: new Date().toISOString().split('T')[0] };
+            let commandes = DB.get("commandes");
+            commandes.push(nouvelleCommande);
+            DB.save("commandes", commandes);
+
+            // 2. Générer l'ordonnancement dans le planning de production
+            const nouvellePlanif = { id: planId, commandeId: cmdId, machine, operateurId, priorite, statut: "En attente", dateLivraison };
+            let planifications = DB.get("planifications");
+            planifications.push(nouvellePlanif);
+            DB.save("planifications", planifications);
+
+            alert("Commande validée ! Le travail a été envoyé instantanément au tableau de bord de production.");
+            document.getElementById("form-commande").reset();
+            afficherCommandesEtPlanif();
+        });
+
+        // Supprimer/Annuler une commande et sa planification (Cascade Delete local)
+        window.annulerCommande = function(id) {
+            if (confirm("Voulez-vous vraiment annuler cette commande et la retirer du planning de production ?")) {
+                let commandes = DB.get("commandes");
+                commandes = commandes.filter(c => c.id !== id);
+                DB.save("commandes", commandes);
+
+                let planifications = DB.get("planifications");
+                planifications = planifications.filter(p => p.commandeId !== id);
+                DB.save("planifications", planifications);
+
+                afficherCommandesEtPlanif();
+            }
+        };
+
+        // Lancement initial
+        preparerFormulaire();
+        afficherCommandesEtPlanif();
+    </script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBENEZER - Gestion Utilisateurs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-wrapper" style="display: flex; min-height: 100vh;">
+        <aside class="sidebar" style="width: 260px; background: #0f172a; color: white; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div class="logo" style="font-size: 20px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-print" style="color: #2563eb;"></i>
+                    <span>EBENEZER</span>
+                </div>
+                <nav style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="dashboard.html" class="nav-item" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                    <a href="clients.html" id="menu-clients" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-users"></i> Gestion Clients</a>
+                    <a href="commandes.html" id="menu-commandes" style="color: #94a3b8; text-decoration: none; padding: 12px; display: block;"><i class="fa-solid fa-file-invoice"></i> Commandes</a>
+                    <a href="utilisateurs.html" class="nav-item active" style="color: white; text-decoration: none; padding: 12px; border-radius: 8px; background: #1e293b; display: block;"><i class="fa-solid fa-user-gear"></i> Utilisateurs</a>
+                </nav>
+            </div>
+            <div>
+                <button onclick="deconnexion()" style="width: 100%; padding: 8px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                    <i class="fa-solid fa-power-off"></i> Déconnexion
+                </button>
+            </div>
+        </aside>
+
+        <main style="flex: 1; padding: 40px; background: #f8fafc;">
+            <div style="margin-bottom: 30px;">
+                <h1 style="font-size: 28px; color: #0f172a;">Gestion du Personnel & Comptes</h1>
+                <p style="color: #64748b;">Création, affectation des rôles et contrôle des accès de l'imprimerie</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); height: fit-content;">
+                    <h3 id="user-form-title" style="margin-bottom: 20px; color: #0f172a;"><i class="fa-solid fa-user-plus" style="color:#2563eb;"></i> Ajouter un Agent</h3>
+                    <form id="form-user">
+                        <input type="hidden" id="user-id">
+                        
+                        <div class="form-group">
+                            <label>Nom Complet</label>
+                            <input type="text" id="user-nom" placeholder="Ex: Atlas Kayembe" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Adresse Email (Identifiant)</label>
+                            <input type="email" id="user-email" placeholder="Ex: atlas@ebenezer.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mot de passe initial</label>
+                            <input type="password" id="user-mdp" placeholder="Ex: 1234" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rôle du Système</label>
+                            <select id="user-role" required>
+                                <option value="Opérateur">Opérateur (Technicien Machine)</option>
+                                <option value="Planificateur">Planificateur (Gestion Administrative)</option>
+                                <option value="Administrateur">Administrateur (Contrôle total)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" id="btn-submit-user" class="btn-login" style="margin-top: 10px;">
+                            <i class="fa-solid fa-user-check"></i> Activer le compte
+                        </button>
+                        <button type="button" id="btn-user-annuler" onclick="reinitialiserFormUtilisateur()" style="width: 100%; margin-top: 10px; padding: 10px; background: #cbd5e1; color: #334155; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; display: none;">
+                            Annuler modification
+                        </button>
+                    </form>
+                </div>
+
+                <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 20px; color: #0f172a;">Membres d'équipe enregistrés</h3>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 13px;">
+                                <th style="padding: 12px;">NOM DE L'AGENT</th>
+                                <th style="padding: 12px;">EMAIL (IDENTIFIANT)</th>
+                                <th style="padding: 12px;">RÔLE</th>
+                                <th style="padding: 12px; text-align: right;">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body-users">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/donnees.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // SÉCURITÉ ABSOLUE : Seul l'Administrateur suprême a le droit d'ouvrir cette interface !
+        const checkUser = verifierSecuritePage();
+        if (checkUser.role !== "Administrateur") {
+            // Rejet immédiat si un intrus ou un planificateur essaie d'ouvrir la page
+            alert("Accès refusé ! Cette zone est réservée exclusivement à la Direction de l'imprimerie.");
+            window.location.href = "dashboard.html";
+        }
+
+        const userForm = document.getElementById("form-user");
+        const userTbody = document.getElementById("table-body-users");
+
+        // Fonction pour lister les utilisateurs
+        function afficherUtilisateurs() {
+            const users = DB.get("users");
+            userTbody.innerHTML = "";
+
+            users.forEach(u => {
+                // Style des badges de rôles
+                let roleColor = u.role === "Administrateur" ? "#dc2626" : (u.role === "Planificateur" ? "#2563eb" : "#16a34a");
+                let roleBg = u.role === "Administrateur" ? "#fef2f2" : (u.role === "Planificateur" ? "#eff6ff" : "#f0fdf4");
+
+                const tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid #f1f5f9";
+                tr.innerHTML = `
+                    <td style="padding: 14px; font-weight: 600; color: #0f172a;">${u.nom}</td>
+                    <td style="padding: 14px; color: #475569;"><i class="fa-solid fa-id-badge" style="color:#64748b; margin-right:5px;"></i> ${u.email}</td>
+                    <td style="padding: 14px;"><span style="background:${roleBg}; color:${roleColor}; padding:4px 10px; border-radius:12px; font-size:12px; font-weight:600;">${u.role}</span></td>
+                    <td style="padding: 14px; text-align: right;">
+                        <button onclick="chargerUtilisateur('${u.id}')" style="background:none; border:none; color:#2563eb; cursor:pointer; font-size:14px; margin-right:10px;" title="Modifier les privilèges">
+                            <i class="fa-solid fa-user-pen"></i>
+                        </button>
+                        <button onclick="supprimerUtilisateur('${u.id}', '${u.email}')" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:14px;" title="Révoquer l'accès">
+                            <i class="fa-solid fa-user-xmark"></i>
+                        </button>
+                    </td>
+                `;
+                userTbody.appendChild(tr);
+            });
+        }
+
+        // Ajouter ou Éditer un compte
+        userForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById("user-id").value;
+            const nom = document.getElementById("user-nom").value.trim();
+            const email = document.getElementById("user-email").value.trim();
+            const mdp = document.getElementById("user-mdp").value;
+            const role = document.getElementById("user-role").value;
+
+            let users = DB.get("users");
+
+            if (id) {
+                // Modification d'un compte
+                users = users.map(u => u.id === id ? { id, nom, email, mdp, role } : u);
+                alert("Les privilèges de l'agent ont été mis à jour avec succès !");
+            } else {
+                // Vérifier si l'email existe déjà
+                if (users.some(u => u.email === email)) {
+                    alert("Erreur : Un compte possède déjà cet identifiant email.");
+                    return;
+                }
+                // Création du compte
+                const nouveauUser = { id: "u_" + Date.now(), nom, email, mdp, role };
+                users.push(nouveauUser);
+                alert("Le compte de l'agent a été configuré et activé !");
+            }
+
+            DB.save("users", users);
+            reinitialiserFormUtilisateur();
+            afficherUtilisateurs();
+        });
+
+        // Charger pour modification
+        window.chargerUtilisateur = function(id) {
+            const u = DB.trouverParId("users", id);
+            if (u) {
+                document.getElementById("user-id").value = u.id;
+                document.getElementById("user-nom").value = u.nom;
+                document.getElementById("user-email").value = u.email;
+                document.getElementById("user-mdp").value = u.mdp;
+                document.getElementById("user-role").value = u.role;
+
+                document.getElementById("user-form-title").innerHTML = `<i class="fa-solid fa-user-pen"></i> Modifier les Privilèges`;
+                document.getElementById("btn-submit-user").innerHTML = `<i class="fa-solid fa-rotate"></i> Appliquer les changements`;
+                document.getElementById("btn-user-annuler").style.display = "block";
+            }
+        };
+
+        // Supprimer / Révoquer un accès
+        window.supprimerUtilisateur = function(id, email) {
+            // Sécurité anti-auto-destruction : L'admin connecté ne doit pas pouvoir supprimer son propre compte
+            const administrateurActuel = JSON.parse(localStorage.getItem("session_active"));
+            if (administrateurActuel.id === id) {
+                alert("Action impossible : Vous ne pouvez pas révoquer votre propre compte Administrateur en cours de session !");
+                return;
+            }
+
+            if (confirm(`Êtes-vous sûr de vouloir révoquer définitivement les accès de l'adresse : ${email} ?`)) {
+                let users = DB.get("users");
+                users = users.filter(u => u.id !== id);
+                DB.save("users", users);
+                afficherUtilisateurs();
+            }
+        };
+
+        function reinitialiserFormUtilisateur() {
+            userForm.reset();
+            document.getElementById("user-id").value = "";
+            document.getElementById("user-form-title").innerHTML = `<i class="fa-solid fa-user-plus"></i> Ajouter un Agent`;
+            document.getElementById("btn-submit-user").innerHTML = `<i class="fa-solid fa-user-check"></i> Activer le compte`;
+            document.getElementById("btn-user-annuler").style.display = "none";
+        }
+
+        // Lancement automatique
+        afficherUtilisateurs();
+    </script>
+</body>
+</html>
